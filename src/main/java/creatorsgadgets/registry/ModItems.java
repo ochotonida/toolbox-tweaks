@@ -3,10 +3,13 @@ package creatorsgadgets.registry;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.util.entry.ItemEntry;
 import creatorsgadgets.CreatorsGadgets;
+import creatorsgadgets.data.ModItemModelProvider;
 import creatorsgadgets.item.EquipableItem;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.CompassItem;
 import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -34,6 +37,10 @@ public class ModItems {
             .register();
     public static final ItemEntry<EquipableItem> TOOLBOX_RESONATOR = REGISTRATE.item("toolbox_resonator", p -> new EquipableItem(p, EquipmentSlot.HEAD))
             .model((i, t) -> { })
+            .properties(p -> p.stacksTo(1))
+            .register();
+    public static final ItemEntry<? extends Item> GAUGE_COMPASS = REGISTRATE.item("gauge_compass", CompassItem::new)
+            .model(ModItemModelProvider::createCompassModel)
             .properties(p -> p.stacksTo(1))
             .register();
 
