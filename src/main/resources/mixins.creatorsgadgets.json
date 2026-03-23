@@ -3,9 +3,6 @@
   "package": "creatorsgadgets.mixin",
   "compatibilityLevel": "JAVA_8",
   "refmap": "mixins.creatorsgadgets.refmap.json",
-  "mixins": [
-    "toolbox.ToolboxHandlerMixin"
-  ],
   "injectors": {
     "defaultRequire": 1
   },

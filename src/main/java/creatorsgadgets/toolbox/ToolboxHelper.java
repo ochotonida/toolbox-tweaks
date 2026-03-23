@@ -2,11 +2,9 @@ package creatorsgadgets.toolbox;
 
 import com.simibubi.create.content.equipment.toolbox.ToolboxBlockEntity;
 import com.simibubi.create.content.equipment.toolbox.ToolboxHandler;
-import creatorsgadgets.registry.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -62,10 +60,5 @@ public class ToolboxHelper {
             }
         }
         return null;
-    }
-
-    public static boolean hasToolboxRadar(LivingEntity entity) {
-        return ModItems.TOOLBOX_RADAR.get().isEquipped(entity)
-                || ModItems.TOOLBOX_RESONATOR.get().isEquipped(entity);
     }
 }

@@ -26,7 +26,7 @@ public class ToolboxHandlerClientMixin {
     @Inject(method = "onKeyInput", at = @At(value = "INVOKE", target = "Ljava/util/List;isEmpty()Z"), remap = false)
     private static void forceOpenSelectBox(int key, boolean pressed, CallbackInfo ci) {
         LocalPlayer player = Minecraft.getInstance().player;
-        if (!ToolboxHelper.hasToolboxRadar(player) || player == null) {
+        if (player == null) {
             return;
         }
         List<ToolboxBlockEntity> toolboxes = ToolboxHandler.getNearest(player.level(), player, 8);
@@ -38,10 +38,7 @@ public class ToolboxHandlerClientMixin {
 
     @ModifyExpressionValue(method = "onKeyInput", at = @At(value = "INVOKE", target = "Ljava/util/List;size()I"), remap = false)
     private static int modifyToolboxSizeCheck(int original) {
-        if (original == 1
-            && ToolboxHelper.hasToolboxRadar(Minecraft.getInstance().player)
-            && creatorsGadgets$hasToolboxesOutsideRange(Minecraft.getInstance().player)
-        ) {
+        if (original == 1 && creatorsGadgets$hasToolboxesOutsideRange(Minecraft.getInstance().player)) {
             return 2;
         }
         return original;

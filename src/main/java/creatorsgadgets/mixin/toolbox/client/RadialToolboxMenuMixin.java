@@ -66,9 +66,6 @@ public abstract class RadialToolboxMenuMixin extends AbstractSimiScreen {
 
     @Inject(method = "renderWindow", remap = false, at = @At("TAIL"))
     public void renderWindow(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
-        if (!ToolboxHelper.hasToolboxRadar(getMinecraft().player)) {
-            return;
-        }
         float fade = Mth.clamp(((float)ticksOpen + AnimationTickHolder.getPartialTicks()) / 10F, 0.002F, 1F);
         Component tooltip = null;
 

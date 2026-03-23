@@ -1,7 +1,0 @@
-{
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "creatorsgadgets:item/gauge_compass_base",
-    "layer1": "creatorsgadgets:item/compass_needle_14"
-  }
-}
