@@ -5,6 +5,7 @@ import com.tterrag.registrate.util.entry.ItemEntry;
 import creatorsgadgets.CreatorsGadgets;
 import creatorsgadgets.data.ModItemModelProvider;
 import creatorsgadgets.item.EquipableItem;
+import creatorsgadgets.item.WatchItem;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.CompassItem;
@@ -42,6 +43,10 @@ public class ModItems {
     public static final ItemEntry<? extends Item> GAUGE_COMPASS = REGISTRATE.item("gauge_compass", CompassItem::new)
             .model(ModItemModelProvider::createCompassModel)
             .properties(p -> p.stacksTo(1))
+            .register();
+    public static final ItemEntry<WatchItem> PECULIAR_WATCH = REGISTRATE.item("peculiar_watch", WatchItem::new)
+            .properties(p -> p.stacksTo(1))
+            .model((i, t) -> { })
             .register();
 
     public static void register() {

@@ -1,0 +1,30 @@
+{
+	"textures": {
+		"0": "creatorsgadgets:item/peculiar_watch",
+		"particle": "creatorsgadgets:item/peculiar_watch"
+	},
+	"elements": [
+		{
+			"from": [7.75, 11.075, 7],
+			"to": [8.25, 11.075, 8],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 8, 8]},
+			"faces": {
+				"up": {"uv": [8, 8, 9, 10], "texture": "#0"}
+			}
+		}
+	],
+	"display": {
+		"thirdperson_righthand": {
+			"rotation": [0, 180, 90],
+			"translation": [0, -2, 3]
+		},
+		"thirdperson_lefthand": {
+			"rotation": [0, 0, -90],
+			"translation": [0, -2, 4]
+		},
+		"head": {
+			"rotation": [90, 180, 180],
+			"scale": [3, 3, 3]
+		}
+	}
+}

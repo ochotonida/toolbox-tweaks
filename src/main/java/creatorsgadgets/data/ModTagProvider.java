@@ -28,6 +28,12 @@ public class ModTagProvider {
                 ModItems.TOOLBOX_RADAR.get(),
                 ModItems.TOOLBOX_RESONATOR.get()
         );
+        prov.tag(key(ModCompat.CURIOS, "bracelet")).add(
+                ModItems.PECULIAR_WATCH.get()
+        );
+        prov.tag(key(ModCompat.CURIOS, "hands")).add(
+                ModItems.PECULIAR_WATCH.get()
+        );
     }
 
     private static TagKey<Item> key(String namespace, String path) {

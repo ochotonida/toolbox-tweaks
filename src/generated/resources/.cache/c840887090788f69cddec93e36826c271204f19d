@@ -1,6 +1,6 @@
-// 1.20.1	2025-03-28T16:24:10.7443296	Registrate Provider for creatorsgadgets [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
-31a7d9da98c6089c18138fc516fe22ed08c636c2 assets/creatorsgadgets/lang/en_ud.json
-23a23406698146101504be9fdf8147eae14fd602 assets/creatorsgadgets/lang/en_us.json
+// 1.20.1	2025-03-28T20:23:09.7874999	Registrate Provider for creatorsgadgets [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
+285438d7667bf6e41aa3caa15c4460a1fac2bdfe assets/creatorsgadgets/lang/en_ud.json
+40eb57916cc65a2d7e7902b0740d4c861ae6fe3e assets/creatorsgadgets/lang/en_us.json
 5552400cf3ede0b2d851b4a361fed6ed1c58d52c assets/creatorsgadgets/models/item/gauge_compass.json
 4ed7dab760330b774847833cd3d27c542224f828 assets/creatorsgadgets/models/item/gauge_compass_00.json
 71590aead36c18bd8c709c0cbe4ba01d902a56cb assets/creatorsgadgets/models/item/gauge_compass_01.json
@@ -34,5 +34,7 @@ de96443d16e860f745f51ca9a45adc13a0f446bd assets/creatorsgadgets/models/item/gaug
 d3543446c3e1fb8e08a1f0a5fb8c9e7310359066 assets/creatorsgadgets/models/item/gauge_compass_29.json
 0914602fa271babb1a68d293ca435a13e2630ca2 assets/creatorsgadgets/models/item/gauge_compass_30.json
 b4df46189dee57d3cff6f9aad954ecb76757ee37 assets/creatorsgadgets/models/item/gauge_compass_31.json
+81fe4eb42a60efb15cb1e934cbb899878f571fcf data/curios/tags/items/bracelet.json
 713b61e825bc5677c36f19470e2d820acc54b13f data/curios/tags/items/charm.json
+81fe4eb42a60efb15cb1e934cbb899878f571fcf data/curios/tags/items/hands.json
 713b61e825bc5677c36f19470e2d820acc54b13f data/curios/tags/items/head.json

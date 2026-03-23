@@ -26,6 +26,8 @@ public class ModTooltipProvider {
                 .summary("A compass that helps you locate _Factory Gauges_ that craft a specific item.")
                 .condition("When Used on Block", "_Tunes_ this compass to the _logistics network_.")
                 .condition("When R-Clicked", "Opens the _configuration interface_.");
+        item(ModItems.PECULIAR_WATCH)
+                .summary("Never lose track of time with this handy watch.");
     }
 
     private Builder item(ItemEntry<?> item) {
