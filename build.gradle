@@ -81,8 +81,8 @@ dependencies {
 }
 
 mixin {
-    add sourceSets.main, 'mixins.creatorsgadgets.refmap.json'
-    config 'mixins.creatorsgadgets.json'
+    add sourceSets.main, 'mixins.toolboxtweaks.refmap.json'
+    config 'mixins.toolboxtweaks.json'
 }
 
 tasks.named('processResources', ProcessResources).configure {

@@ -1,6 +1,6 @@
 {
   "required": true,
-  "package": "creatorsgadgets.mixin",
+  "package": "toolboxtweaks.mixin",
   "compatibilityLevel": "JAVA_8",
   "refmap": "mixins.creatorsgadgets.refmap.json",
   "injectors": {

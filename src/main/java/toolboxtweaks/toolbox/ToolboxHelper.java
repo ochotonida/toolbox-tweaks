@@ -1,4 +1,4 @@
-package creatorsgadgets.toolbox;
+package toolboxtweaks.toolbox;
 
 import com.simibubi.create.content.equipment.toolbox.ToolboxBlockEntity;
 import com.simibubi.create.content.equipment.toolbox.ToolboxHandler;

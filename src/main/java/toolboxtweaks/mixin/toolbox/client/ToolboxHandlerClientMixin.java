@@ -1,4 +1,4 @@
-package creatorsgadgets.mixin.toolbox.client;
+package toolboxtweaks.mixin.toolbox.client;
 
 import com.google.common.collect.ImmutableList;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
@@ -6,7 +6,7 @@ import com.simibubi.create.content.equipment.toolbox.RadialToolboxMenu;
 import com.simibubi.create.content.equipment.toolbox.ToolboxBlockEntity;
 import com.simibubi.create.content.equipment.toolbox.ToolboxHandler;
 import com.simibubi.create.content.equipment.toolbox.ToolboxHandlerClient;
-import creatorsgadgets.toolbox.ToolboxHelper;
+import toolboxtweaks.toolbox.ToolboxHelper;
 import net.createmod.catnip.gui.ScreenOpener;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;

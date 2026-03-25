@@ -1,4 +1,4 @@
-package creatorsgadgets.mixin.toolbox.client;
+package toolboxtweaks.mixin.toolbox.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -7,7 +7,7 @@ import com.simibubi.create.content.equipment.toolbox.RadialToolboxMenu;
 import com.simibubi.create.content.equipment.toolbox.ToolboxBlockEntity;
 import com.simibubi.create.content.equipment.toolbox.ToolboxHandler;
 import com.simibubi.create.foundation.gui.AllGuiTextures;
-import creatorsgadgets.toolbox.ToolboxHelper;
+import toolboxtweaks.toolbox.ToolboxHelper;
 import dev.engine_room.flywheel.lib.transform.TransformStack;
 import net.createmod.catnip.animation.AnimationTickHolder;
 import net.createmod.catnip.gui.AbstractSimiScreen;
