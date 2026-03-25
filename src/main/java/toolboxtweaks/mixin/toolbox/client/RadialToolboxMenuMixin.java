@@ -47,19 +47,19 @@ public abstract class RadialToolboxMenuMixin extends AbstractSimiScreen {
     private boolean scrollMode;
 
     @Unique
-    private List<ToolboxBlockEntity> creatorsGadgets$distantToolboxes = List.of();
+    private List<ToolboxBlockEntity> toolboxTweaks$distantToolboxes = List.of();
     @Unique
     @Nullable
-    private ToolboxBlockEntity creatorsGadgets$detachedBox;
+    private ToolboxBlockEntity toolboxTweaks$detachedBox;
 
     @Inject(method = "<init>", remap = false, at = @At("TAIL"))
     private void init(List<ToolboxBlockEntity> toolboxes, RadialToolboxMenu.State state, ToolboxBlockEntity selectedBox, CallbackInfo ci) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player != null) {
             if (state == RadialToolboxMenu.State.SELECT_BOX && toolboxes.size() < 8) {
-                creatorsGadgets$distantToolboxes = ToolboxHelper.getNearestOutsideRange(player.level(), player, 8 - toolboxes.size());
+                toolboxTweaks$distantToolboxes = ToolboxHelper.getNearestOutsideRange(player.level(), player, 8 - toolboxes.size());
             } else if (state == RadialToolboxMenu.State.DETACH) {
-                creatorsGadgets$detachedBox = ToolboxHelper.getBoxForSelectedItem(player);
+                toolboxTweaks$detachedBox = ToolboxHelper.getBoxForSelectedItem(player);
             }
         }
     }
@@ -74,7 +74,7 @@ public abstract class RadialToolboxMenuMixin extends AbstractSimiScreen {
         ms.translate(width / 2F, height / 2F, 0);
         int slot;
         if (state == RadialToolboxMenu.State.DETACH) {
-            creatorsgadgets$renderToolboxDistance(graphics, creatorsGadgets$detachedBox, fade, true);
+            toolboxTweaks$renderToolboxDistance(graphics, toolboxTweaks$detachedBox, fade, true);
         } else if (state == RadialToolboxMenu.State.SELECT_BOX) {
             for (slot = 0; slot < 8; ++slot) {
                 ms.pushPose();
@@ -84,10 +84,10 @@ public abstract class RadialToolboxMenuMixin extends AbstractSimiScreen {
                         .rotateZDegrees(-slot * 45 + 45);
                 if (slot < toolboxes.size()) {
                     ToolboxBlockEntity toolbox = toolboxes.get(slot);
-                    creatorsgadgets$renderToolboxDistance(graphics, toolbox, fade, false);
-                } else if (slot - toolboxes.size() < creatorsGadgets$distantToolboxes.size()){
-                    ToolboxBlockEntity toolbox = creatorsGadgets$distantToolboxes.get(slot - toolboxes.size());
-                    Component text = creatorsGadgets$renderDistantToolbox(graphics, slot, toolbox, fade);
+                    toolboxTweaks$renderToolboxDistance(graphics, toolbox, fade, false);
+                } else if (slot - toolboxes.size() < toolboxTweaks$distantToolboxes.size()){
+                    ToolboxBlockEntity toolbox = toolboxTweaks$distantToolboxes.get(slot - toolboxes.size());
+                    Component text = toolboxTweaks$renderDistantToolbox(graphics, slot, toolbox, fade);
                     if (text != null) {
                         tooltip = text;
                     }
@@ -98,18 +98,18 @@ public abstract class RadialToolboxMenuMixin extends AbstractSimiScreen {
         ms.popPose();
 
         if (tooltip != null) {
-            creatorsGadgets$renderTooltip(graphics, tooltip, fade);
+            toolboxTweaks$renderTooltip(graphics, tooltip, fade);
         }
     }
 
     @Unique
-    private Component creatorsGadgets$renderDistantToolbox(GuiGraphics graphics, int slot, ToolboxBlockEntity toolbox, float fade) {
+    private Component toolboxTweaks$renderDistantToolbox(GuiGraphics graphics, int slot, ToolboxBlockEntity toolbox, float fade) {
         AllGuiTextures.TOOLBELT_INACTIVE_SLOT.render(graphics, -12, -12);
         GuiGameElement.of(AllBlocks.TOOLBOXES.get(toolbox.getColor())
                         .asStack())
                 .at(-9, -9)
                 .render(graphics);
-        creatorsgadgets$renderToolboxDistance(graphics, toolbox, fade, true);
+        toolboxTweaks$renderToolboxDistance(graphics, toolbox, fade, true);
         if (slot == (scrollMode ? scrollSlot : hoveredSlot)) {
             return toolbox.getDisplayName();
         }
@@ -117,7 +117,7 @@ public abstract class RadialToolboxMenuMixin extends AbstractSimiScreen {
     }
 
     @Unique
-    private void creatorsgadgets$renderToolboxDistance(GuiGraphics graphics, ToolboxBlockEntity toolbox, float fade, boolean distant) {
+    private void toolboxTweaks$renderToolboxDistance(GuiGraphics graphics, ToolboxBlockEntity toolbox, float fade, boolean distant) {
         PoseStack ms = graphics.pose();
         ms.pushPose();
         ms.translate(8, -0.5, 150);
@@ -136,22 +136,22 @@ public abstract class RadialToolboxMenuMixin extends AbstractSimiScreen {
         Component text = Component
                 .literal(Math.min(99, distance) + (distance > 99 ? "+" : "m"))
                 .withStyle(style);
-        creatorsGadgets$renderText(graphics, text, fade, -this.font.width(text), 0, true);
+        toolboxTweaks$renderText(graphics, text, fade, -this.font.width(text), 0, true);
         ms.popPose();
     }
 
     @Unique
-    private void creatorsGadgets$renderTooltip(GuiGraphics graphics, Component text, float fade) {
+    private void toolboxTweaks$renderTooltip(GuiGraphics graphics, Component text, float fade) {
         PoseStack ms = graphics.pose();
         ms.pushPose();
         ms.translate((float) (width / 2), (float) (height - 68), 0F);
         float textWidth = font.width(text);
-        creatorsGadgets$renderText(graphics, text, fade, Math.round(-textWidth / 2), -4, false);
+        toolboxTweaks$renderText(graphics, text, fade, Math.round(-textWidth / 2), -4, false);
         ms.popPose();
     }
 
     @Unique
-    private void creatorsGadgets$renderText(GuiGraphics graphics, Component text, float fade, int dx, int dy, boolean shadow) {
+    private void toolboxTweaks$renderText(GuiGraphics graphics, Component text, float fade, int dx, int dy, boolean shadow) {
         int a = Math.min(255, (int) (fade * 255F));
         if (a > 8) {
             RenderSystem.enableBlend();
