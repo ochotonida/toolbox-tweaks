@@ -53,7 +53,7 @@ public class ToolboxHandlerClientMixin {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
         if (player == null) {
-            return null;
+            throw new IllegalStateException("Client player is null");
         }
 
         Inventory inventory = player.getInventory();
@@ -80,7 +80,9 @@ public class ToolboxHandlerClientMixin {
             }
         }
 
-        // prioritize re-using slots that are already linked with a toolbox
+        /* otherwise, use a slot that is already linked with a toolbox
+         * Ignore items marked by IForgeItemStack::isNotReplaceableByPickAction, even in linked slots
+         */
         for (int i = 0; i < 9; ++i) {
             int slot = (inventory.selected + i) % 9;
             if (!inventory.items.get(slot).isNotReplaceableByPickAction(inventory.player, slot)
@@ -90,7 +92,12 @@ public class ToolboxHandlerClientMixin {
             }
         }
 
-        // call original in case of mixins by other mods
+        /* call original in case of mixins by other mods
+         * - Tries to find an empty slot first (already handled here)
+         * - Then tries to replace an item not marked by IForgeItemStack::isNotReplaceableByPickAction
+         *   - only returns true for enchanted items by default
+         * - otherwise, replaces the held item
+         */
         return inventory.getSuitableHotbarSlot();
     }
 
