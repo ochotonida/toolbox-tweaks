@@ -7,6 +7,8 @@ import com.simibubi.create.content.equipment.toolbox.RadialToolboxMenu;
 import com.simibubi.create.content.equipment.toolbox.ToolboxBlockEntity;
 import com.simibubi.create.content.equipment.toolbox.ToolboxHandler;
 import com.simibubi.create.foundation.gui.AllGuiTextures;
+import net.minecraft.world.item.ItemStack;
+import toolboxtweaks.toolbox.ToolboxItemReference;
 import toolboxtweaks.toolbox.ToolboxHelper;
 import dev.engine_room.flywheel.lib.transform.TransformStack;
 import net.createmod.catnip.animation.AnimationTickHolder;
@@ -32,6 +34,9 @@ import java.util.List;
 @Mixin(value = RadialToolboxMenu.class)
 public abstract class RadialToolboxMenuMixin extends AbstractSimiScreen {
 
+    @Unique
+    private static final int toolboxTweaks$NUM_COMPARTMENTS = 8;
+
     @Shadow(remap = false)
     private RadialToolboxMenu.State state;
     @Shadow(remap = false)
@@ -47,6 +52,8 @@ public abstract class RadialToolboxMenuMixin extends AbstractSimiScreen {
     private boolean scrollMode;
 
     @Unique
+    private List<ToolboxItemReference> toolboxTweaks$inventoryToolboxes = List.of();
+    @Unique
     private List<ToolboxBlockEntity> toolboxTweaks$distantToolboxes = List.of();
     @Unique
     @Nullable
@@ -55,51 +62,77 @@ public abstract class RadialToolboxMenuMixin extends AbstractSimiScreen {
     @Inject(method = "<init>", remap = false, at = @At("TAIL"))
     private void init(List<ToolboxBlockEntity> toolboxes, RadialToolboxMenu.State state, ToolboxBlockEntity selectedBox, CallbackInfo ci) {
         LocalPlayer player = Minecraft.getInstance().player;
-        if (player != null) {
-            if (state == RadialToolboxMenu.State.SELECT_BOX && toolboxes.size() < 8) {
-                toolboxTweaks$distantToolboxes = ToolboxHelper.getNearestOutsideRange(player.level(), player, 8 - toolboxes.size());
-            } else if (state == RadialToolboxMenu.State.DETACH) {
-                toolboxTweaks$detachedBox = ToolboxHelper.getBoxForSelectedItem(player);
-            }
+        if (player == null) {
+            throw new IllegalStateException("Client player is null");
         }
+
+        int availableSlots = toolboxTweaks$NUM_COMPARTMENTS - toolboxes.size();
+        if (availableSlots > 0) {
+            toolboxTweaks$distantToolboxes = ToolboxHelper.getNearestOutsideRange(player.level(), player, availableSlots);
+            availableSlots -= toolboxTweaks$distantToolboxes.size();
+        }
+        if (availableSlots > 0) {
+            toolboxTweaks$inventoryToolboxes = ToolboxHelper.findToolboxesInInventory(player, availableSlots);
+        }
+        toolboxTweaks$detachedBox = ToolboxHelper.getBoxForSelectedItem(player);
     }
 
     @Inject(method = "renderWindow", remap = false, at = @At("TAIL"))
     public void renderWindow(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
-        float fade = Mth.clamp(((float)ticksOpen + AnimationTickHolder.getPartialTicks()) / 10F, 0.002F, 1F);
-        Component tooltip = null;
+        float fade = Mth.clamp(((float) ticksOpen + AnimationTickHolder.getPartialTicks()) / 10F, 0.002F, 1F);
 
         PoseStack ms = graphics.pose();
         ms.pushPose();
-        ms.translate(width / 2F, height / 2F, 0);
-        int slot;
+
         if (state == RadialToolboxMenu.State.DETACH) {
+            ms.translate(width / 2F, height / 2F, 0);
             toolboxTweaks$renderToolboxDistance(graphics, toolboxTweaks$detachedBox, fade, true);
         } else if (state == RadialToolboxMenu.State.SELECT_BOX) {
-            for (slot = 0; slot < 8; ++slot) {
+            Component tooltip = null;
+            for (int slot = 0; slot < 8; slot++) {
                 ms.pushPose();
+                ms.translate(width / 2F, height / 2F, 0);
                 TransformStack.of(ms)
                         .rotateZDegrees(slot * 45 - 45)
                         .translate(0, -40 + 10 * (1 - fade) * (1 - fade), 0)
                         .rotateZDegrees(-slot * 45 + 45);
-                if (slot < toolboxes.size()) {
-                    ToolboxBlockEntity toolbox = toolboxes.get(slot);
-                    toolboxTweaks$renderToolboxDistance(graphics, toolbox, fade, false);
-                } else if (slot - toolboxes.size() < toolboxTweaks$distantToolboxes.size()){
-                    ToolboxBlockEntity toolbox = toolboxTweaks$distantToolboxes.get(slot - toolboxes.size());
-                    Component text = toolboxTweaks$renderDistantToolbox(graphics, slot, toolbox, fade);
-                    if (text != null) {
-                        tooltip = text;
-                    }
+                Component currentSlotTooltip = toolboxTweaks$renderSlot(graphics, slot, fade);
+                if (currentSlotTooltip != null) {
+                    tooltip = currentSlotTooltip;
                 }
                 ms.popPose();
             }
+            if (tooltip != null) {
+                toolboxTweaks$renderTooltip(graphics, tooltip, fade);
+            }
         }
-        ms.popPose();
 
-        if (tooltip != null) {
-            toolboxTweaks$renderTooltip(graphics, tooltip, fade);
+        ms.popPose();
+    }
+
+    @Unique
+    private Component toolboxTweaks$renderSlot(GuiGraphics graphics, int slot, float fade) {
+        int distantStart = toolboxes.size();
+        int inventoryStart = distantStart + toolboxTweaks$distantToolboxes.size();
+
+        if (slot < distantStart) {
+            toolboxTweaks$renderToolboxDistance(graphics, toolboxes.get(slot), fade, false);
+        } else if (slot < inventoryStart) {
+            return toolboxTweaks$renderDistantToolbox(graphics, slot, toolboxTweaks$distantToolboxes.get(slot - distantStart), fade);
+        } else if (slot - inventoryStart < toolboxTweaks$inventoryToolboxes.size()) {
+            return toolboxTweaks$renderInventoryToolbox(graphics, slot, toolboxTweaks$inventoryToolboxes.get(slot - inventoryStart).stack());
         }
+        return null;
+    }
+
+    @Unique
+    private Component toolboxTweaks$renderInventoryToolbox(GuiGraphics graphics, int slot, ItemStack stack) {
+        AllGuiTextures.TOOLBELT_INACTIVE_SLOT.render(graphics, -12, -12); // TODO custom texture
+        GuiGameElement.of(stack).at(-9, -9).render(graphics);
+        if (slot == (scrollMode ? scrollSlot : hoveredSlot)) {
+            return stack.getHoverName();
+        }
+        return null;
     }
 
     @Unique
