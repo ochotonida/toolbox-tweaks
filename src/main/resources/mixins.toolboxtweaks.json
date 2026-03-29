@@ -9,6 +9,7 @@
   "minVersion": "0.8",
   "client": [
     "toolbox.client.RadialToolboxMenuMixin",
+    "toolbox.client.ToolboxHandlerClientAccessor",
     "toolbox.client.ToolboxHandlerClientMixin"
   ],
   "mixins": [

@@ -39,6 +39,15 @@ public class ToolboxHelper {
         return positions.map(toolboxMap::get).filter(ToolboxBlockEntity::isFullyInitialized).collect(Collectors.toList());
     }
 
+    private static boolean isLinkedWithToolbox(Player player, int slot) {
+        CompoundTag persistentData = player.getPersistentData();
+        if (!persistentData.contains("CreateToolboxData")) {
+            return false;
+        }
+        CompoundTag toolboxData = player.getPersistentData().getCompound("CreateToolboxData");
+        return toolboxData.contains(String.valueOf(slot));
+    }
+
     @Nullable
     public static ToolboxBlockEntity getBoxForSelectedItem(Player player) {
         Level level = player.level();
@@ -60,6 +69,36 @@ public class ToolboxHelper {
             }
         }
         return null;
+    }
+
+    public static int getSuitableHotbarSlot(Inventory inventory) {
+        // use an empty slot if available
+        for (int i = 0; i < 9; ++i) {
+            int slot = (inventory.selected + i) % 9;
+            if (inventory.items.get(slot).isEmpty()) {
+                return slot;
+            }
+        }
+
+        /* otherwise, use a slot that is already linked with a toolbox
+         * Ignore items marked by IForgeItemStack::isNotReplaceableByPickAction, even in linked slots
+         */
+        for (int i = 0; i < 9; ++i) {
+            int slot = (inventory.selected + i) % 9;
+            if (!inventory.items.get(slot).isNotReplaceableByPickAction(inventory.player, slot)
+                    && isLinkedWithToolbox(inventory.player, slot)
+            ) {
+                return slot;
+            }
+        }
+
+        /* call original in case of mixins by other mods
+         * - Tries to find an empty slot first (already handled here)
+         * - Then tries to replace an item not marked by IForgeItemStack::isNotReplaceableByPickAction
+         *   - only returns true for enchanted items by default
+         * - otherwise, replaces the held item
+         */
+        return inventory.getSuitableHotbarSlot();
     }
 
     public static List<ToolboxItemReference> findToolboxesInInventory(Player player, int limit) {

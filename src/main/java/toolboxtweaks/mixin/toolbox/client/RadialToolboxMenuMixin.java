@@ -7,7 +7,9 @@ import com.simibubi.create.content.equipment.toolbox.RadialToolboxMenu;
 import com.simibubi.create.content.equipment.toolbox.ToolboxBlockEntity;
 import com.simibubi.create.content.equipment.toolbox.ToolboxHandler;
 import com.simibubi.create.foundation.gui.AllGuiTextures;
+import net.minecraft.network.protocol.game.ServerboundPickItemPacket;
 import net.minecraft.world.item.ItemStack;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import toolboxtweaks.toolbox.ToolboxItemReference;
 import toolboxtweaks.toolbox.ToolboxHelper;
 import dev.engine_room.flywheel.lib.transform.TransformStack;
@@ -30,7 +32,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
+import java.util.Objects;
 
+// todo fix right click not working
 @Mixin(value = RadialToolboxMenu.class)
 public abstract class RadialToolboxMenuMixin extends AbstractSimiScreen {
 
@@ -110,6 +114,33 @@ public abstract class RadialToolboxMenuMixin extends AbstractSimiScreen {
         ms.popPose();
     }
 
+    @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true, remap = false)
+    private void onMouseClicked(double x, double y, int button, CallbackInfoReturnable<Boolean> cir) {
+        Player player = Minecraft.getInstance().player;
+        if (button != 0 || player == null) {
+            return;
+        }
+
+        int selected = scrollMode ? scrollSlot : hoveredSlot;
+        int invIndex = selected - toolboxes.size() - toolboxTweaks$distantToolboxes.size();
+        if (invIndex < 0 || invIndex >= toolboxTweaks$inventoryToolboxes.size()) {
+            return;
+        }
+
+        int inventorySlot = toolboxTweaks$inventoryToolboxes.get(invIndex).slot();
+        if (inventorySlot <= 9) { // toolbox is already in hotbar
+            player.getInventory().selected = inventorySlot;
+        } else { // move toolbox to hotbar
+            player.getInventory().selected = ToolboxHelper.getSuitableHotbarSlot(player.getInventory());
+            Objects.requireNonNull(Minecraft.getInstance().getConnection())
+                    .send(new ServerboundPickItemPacket(inventorySlot));
+        }
+
+        onClose();
+        ToolboxHandlerClientAccessor.setCooldown(2);
+        cir.setReturnValue(true); // Early return intended!
+    }
+
     @Unique
     private Component toolboxTweaks$renderSlot(GuiGraphics graphics, int slot, float fade) {
         int distantStart = toolboxes.size();
@@ -127,9 +158,13 @@ public abstract class RadialToolboxMenuMixin extends AbstractSimiScreen {
 
     @Unique
     private Component toolboxTweaks$renderInventoryToolbox(GuiGraphics graphics, int slot, ItemStack stack) {
-        AllGuiTextures.TOOLBELT_INACTIVE_SLOT.render(graphics, -12, -12); // TODO custom texture
+        boolean isSelected = slot == (scrollMode ? scrollSlot : hoveredSlot);
+        AllGuiTextures.TOOLBELT_SLOT.render(graphics, -12, -12); // TODO custom texture
+        if (isSelected) {
+            AllGuiTextures.TOOLBELT_SLOT_HIGHLIGHT.render(graphics, -13, -13);
+        }
         GuiGameElement.of(stack).at(-9, -9).render(graphics);
-        if (slot == (scrollMode ? scrollSlot : hoveredSlot)) {
+        if (isSelected) {
             return stack.getHoverName();
         }
         return null;

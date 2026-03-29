@@ -6,7 +6,6 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.simibubi.create.content.equipment.toolbox.*;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import toolboxtweaks.mixin.toolbox.ToolboxBlockEntityAccessor;
@@ -64,52 +63,10 @@ public class ToolboxHandlerClientMixin {
         if (Inventory.isHotbarSlot(matchingSlot)) {
             inventory.selected = matchingSlot;
         } else {
-            inventory.selected = toolboxTweaks$getSuitableHotbarSlot(inventory);
+            inventory.selected = ToolboxHelper.getSuitableHotbarSlot(inventory);
         }
 
         return original.call(toolboxPos, slot, inventory.selected);
-    }
-
-    @Unique
-    private static int toolboxTweaks$getSuitableHotbarSlot(Inventory inventory) {
-        // use an empty slot if available
-        for (int i = 0; i < 9; ++i) {
-            int slot = (inventory.selected + i) % 9;
-            if (inventory.items.get(slot).isEmpty()) {
-                return slot;
-            }
-        }
-
-        /* otherwise, use a slot that is already linked with a toolbox
-         * Ignore items marked by IForgeItemStack::isNotReplaceableByPickAction, even in linked slots
-         */
-        for (int i = 0; i < 9; ++i) {
-            int slot = (inventory.selected + i) % 9;
-            if (!inventory.items.get(slot).isNotReplaceableByPickAction(inventory.player, slot)
-                    && toolboxTweaks$isLinkedWithToolbox(inventory.player, slot)
-            ) {
-                return slot;
-            }
-        }
-
-        /* call original in case of mixins by other mods
-         * - Tries to find an empty slot first (already handled here)
-         * - Then tries to replace an item not marked by IForgeItemStack::isNotReplaceableByPickAction
-         *   - only returns true for enchanted items by default
-         * - otherwise, replaces the held item
-         */
-        return inventory.getSuitableHotbarSlot();
-    }
-
-    @Unique
-    private static boolean toolboxTweaks$isLinkedWithToolbox(Player player, int slot) {
-        CompoundTag persistentData = player.getPersistentData();
-        if (!persistentData.contains("CreateToolboxData")) {
-            return false;
-        }
-        CompoundTag toolboxData = player.getPersistentData().getCompound("CreateToolboxData");
-        return toolboxData.contains(String.valueOf(slot));
-
     }
 
     @Unique
