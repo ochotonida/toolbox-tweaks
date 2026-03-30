@@ -1,5 +1,8 @@
 package toolboxtweaks.mixin.toolbox.client;
 
+import com.llamalad7.mixinextras.expression.Definition;
+import com.llamalad7.mixinextras.expression.Expression;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.simibubi.create.AllBlocks;
@@ -7,11 +10,6 @@ import com.simibubi.create.content.equipment.toolbox.RadialToolboxMenu;
 import com.simibubi.create.content.equipment.toolbox.ToolboxBlockEntity;
 import com.simibubi.create.content.equipment.toolbox.ToolboxHandler;
 import com.simibubi.create.foundation.gui.AllGuiTextures;
-import net.minecraft.network.protocol.game.ServerboundPickItemPacket;
-import net.minecraft.world.item.ItemStack;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import toolboxtweaks.toolbox.ToolboxItemReference;
-import toolboxtweaks.toolbox.ToolboxHelper;
 import dev.engine_room.flywheel.lib.transform.TransformStack;
 import net.createmod.catnip.animation.AnimationTickHolder;
 import net.createmod.catnip.gui.AbstractSimiScreen;
@@ -21,8 +19,10 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
+import net.minecraft.network.protocol.game.ServerboundPickItemPacket;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -30,11 +30,13 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import toolboxtweaks.toolbox.ToolboxHelper;
+import toolboxtweaks.toolbox.ToolboxItemReference;
 
 import java.util.List;
 import java.util.Objects;
 
-// todo fix right click not working
 @Mixin(value = RadialToolboxMenu.class)
 public abstract class RadialToolboxMenuMixin extends AbstractSimiScreen {
 
@@ -139,6 +141,18 @@ public abstract class RadialToolboxMenuMixin extends AbstractSimiScreen {
         onClose();
         ToolboxHandlerClientAccessor.setCooldown(2);
         cir.setReturnValue(true); // Early return intended!
+    }
+
+    @Definition(id = "toolboxes", field = "Lcom/simibubi/create/content/equipment/toolbox/RadialToolboxMenu;toolboxes:Ljava/util/List;")
+    @Definition(id = "size", method = "Ljava/util/List;size()I")
+    @Expression("this.toolboxes.size() > 1")
+    @ModifyExpressionValue(
+            method = "mouseClicked",
+            at = @At(value = "MIXINEXTRAS:EXPRESSION"),
+            remap = false
+    )
+    private boolean shouldReturnToBoxSelection(boolean original) {
+        return original || toolboxes.size() + toolboxTweaks$distantToolboxes.size() + toolboxTweaks$inventoryToolboxes.size() > 1;
     }
 
     @Unique
