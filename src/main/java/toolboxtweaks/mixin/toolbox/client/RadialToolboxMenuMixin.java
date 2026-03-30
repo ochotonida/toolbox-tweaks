@@ -116,7 +116,7 @@ public abstract class RadialToolboxMenuMixin extends AbstractSimiScreen {
         ms.popPose();
     }
 
-    @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true, remap = false)
+    @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
     private void onMouseClicked(double x, double y, int button, CallbackInfoReturnable<Boolean> cir) {
         Player player = Minecraft.getInstance().player;
         if (button != 0 || player == null) {
@@ -143,13 +143,12 @@ public abstract class RadialToolboxMenuMixin extends AbstractSimiScreen {
         cir.setReturnValue(true); // Early return intended!
     }
 
-    @Definition(id = "toolboxes", field = "Lcom/simibubi/create/content/equipment/toolbox/RadialToolboxMenu;toolboxes:Ljava/util/List;")
-    @Definition(id = "size", method = "Ljava/util/List;size()I")
+    @Definition(id = "toolboxes", remap = false, field = "Lcom/simibubi/create/content/equipment/toolbox/RadialToolboxMenu;toolboxes:Ljava/util/List;")
+    @Definition(id = "size", remap = false, method = "Ljava/util/List;size()I")
     @Expression("this.toolboxes.size() > 1")
     @ModifyExpressionValue(
             method = "mouseClicked",
-            at = @At(value = "MIXINEXTRAS:EXPRESSION"),
-            remap = false
+            at = @At(value = "MIXINEXTRAS:EXPRESSION")
     )
     private boolean shouldReturnToBoxSelection(boolean original) {
         return original || toolboxes.size() + toolboxTweaks$distantToolboxes.size() + toolboxTweaks$inventoryToolboxes.size() > 1;
