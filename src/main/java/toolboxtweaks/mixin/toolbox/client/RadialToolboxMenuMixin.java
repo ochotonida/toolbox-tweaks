@@ -130,7 +130,7 @@ public abstract class RadialToolboxMenuMixin extends AbstractSimiScreen {
         }
 
         int inventorySlot = toolboxTweaks$inventoryToolboxes.get(invIndex).slot();
-        if (inventorySlot <= 9) { // toolbox is already in hotbar
+        if (inventorySlot < 9) { // toolbox is already in hotbar
             player.getInventory().selected = inventorySlot;
         } else { // move toolbox to hotbar
             player.getInventory().selected = ToolboxHelper.getSuitableHotbarSlot(player.getInventory());
