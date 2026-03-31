@@ -23,6 +23,18 @@ public class ToolboxHelper {
 
     public static final int SCAN_RANGE = 99;
 
+    public static boolean hasInaccessibleToolbox(Player player) {
+        return hasToolboxInInventory(player) || hasToolboxOutsideRange(player);
+    }
+
+    public static boolean hasToolboxInInventory(Player player) {
+        return !findToolboxesInInventory(player, 1).isEmpty();
+    }
+
+    public static boolean hasToolboxOutsideRange(Player player) {
+        return !getNearestOutsideRange(player.level(), player, 1).isEmpty();
+    }
+
     public static List<ToolboxBlockEntity> getNearestOutsideRange(LevelAccessor world, Player player, int maxAmount) {
         double minRange = ToolboxHandler.getMaxRange(player);
         if (SCAN_RANGE <= minRange) {

@@ -43,6 +43,11 @@ public abstract class RadialToolboxMenuMixin extends AbstractSimiScreen {
     @Unique
     private static final int toolboxTweaks$NUM_COMPARTMENTS = 8;
 
+    /* SELECT_BOX: Select between available toolboxes
+     * SELECT_ITEM: Select an item from a toolbox
+     * SELECT_ITEM_UNEQUIP: Select an item from a toolbox, or move the currently selected item back into the toolbox
+     * DETACH: Detach the currently selected item from its toolbox, which is out of range
+     */
     @Shadow(remap = false)
     private RadialToolboxMenu.State state;
     @Shadow(remap = false)
@@ -57,10 +62,13 @@ public abstract class RadialToolboxMenuMixin extends AbstractSimiScreen {
     @Shadow(remap = false)
     private boolean scrollMode;
 
+    /** List of references to toolbox items inside the player's inventory */
     @Unique
     private List<ToolboxItemReference> toolboxTweaks$inventoryToolboxes = List.of();
+    /** List of toolboxes currently out of range (but inside the maximum scan range) */
     @Unique
     private List<ToolboxBlockEntity> toolboxTweaks$distantToolboxes = List.of();
+    /** The toolbox for the currently selected item */
     @Unique
     @Nullable
     private ToolboxBlockEntity toolboxTweaks$detachedBox;
@@ -92,6 +100,7 @@ public abstract class RadialToolboxMenuMixin extends AbstractSimiScreen {
 
         if (state == RadialToolboxMenu.State.DETACH) {
             ms.translate(width / 2F, height / 2F, 0);
+            // render the distance to the out-of-range toolbox for this item
             toolboxTweaks$renderToolboxDistance(graphics, toolboxTweaks$detachedBox, fade, true);
         } else if (state == RadialToolboxMenu.State.SELECT_BOX) {
             Component tooltip = null;
@@ -108,6 +117,7 @@ public abstract class RadialToolboxMenuMixin extends AbstractSimiScreen {
                 }
                 ms.popPose();
             }
+            // render the name of the currently selected toolbox above the player's hotbar
             if (tooltip != null) {
                 toolboxTweaks$renderTooltip(graphics, tooltip, fade);
             }
@@ -116,6 +126,7 @@ public abstract class RadialToolboxMenuMixin extends AbstractSimiScreen {
         ms.popPose();
     }
 
+    // Allow clicking on toolboxes currently in the player's inventory to place them into the currently selected slot
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
     private void onMouseClicked(double x, double y, int button, CallbackInfoReturnable<Boolean> cir) {
         Player player = Minecraft.getInstance().player;
@@ -130,10 +141,11 @@ public abstract class RadialToolboxMenuMixin extends AbstractSimiScreen {
         }
 
         int inventorySlot = toolboxTweaks$inventoryToolboxes.get(invIndex).slot();
-        if (inventorySlot < 9) { // toolbox is already in hotbar
+        if (inventorySlot < 9) {
+            // toolbox is already in hotbar
             player.getInventory().selected = inventorySlot;
-        } else { // move toolbox to hotbar
-            player.getInventory().selected = ToolboxHelper.getSuitableHotbarSlot(player.getInventory());
+        } else {
+            // move toolbox to hotbar
             Objects.requireNonNull(Minecraft.getInstance().getConnection())
                     .send(new ServerboundPickItemPacket(inventorySlot));
         }
@@ -143,6 +155,7 @@ public abstract class RadialToolboxMenuMixin extends AbstractSimiScreen {
         cir.setReturnValue(true); // Early return intended!
     }
 
+    // Switch to the SELECT_BOX menu on right click when there is at least one inaccessible toolbox
     @Definition(id = "toolboxes", remap = false, field = "Lcom/simibubi/create/content/equipment/toolbox/RadialToolboxMenu;toolboxes:Ljava/util/List;")
     @Definition(id = "size", remap = false, method = "Ljava/util/List;size()I")
     @Expression("this.toolboxes.size() > 1")
@@ -160,10 +173,13 @@ public abstract class RadialToolboxMenuMixin extends AbstractSimiScreen {
         int inventoryStart = distantStart + toolboxTweaks$distantToolboxes.size();
 
         if (slot < distantStart) {
+            // render distance for accessible toolboxes
             toolboxTweaks$renderToolboxDistance(graphics, toolboxes.get(slot), fade, false);
         } else if (slot < inventoryStart) {
+            // render toolbox icon and distance for distant toolboxes
             return toolboxTweaks$renderDistantToolbox(graphics, slot, toolboxTweaks$distantToolboxes.get(slot - distantStart), fade);
         } else if (slot - inventoryStart < toolboxTweaks$inventoryToolboxes.size()) {
+            // render toolboxes currently in the player's inventory
             return toolboxTweaks$renderInventoryToolbox(graphics, slot, toolboxTweaks$inventoryToolboxes.get(slot - inventoryStart).stack());
         }
         return null;
@@ -209,8 +225,10 @@ public abstract class RadialToolboxMenuMixin extends AbstractSimiScreen {
         }
         float maxRange = (float) Math.min(ToolboxHandler.getMaxRange(player), 99);
         float d = Math.min(distance, maxRange) / maxRange;
+        // fade between green and orange-red depending on distance and max range
         int color = Mth.hsvToRgb(Mth.lerp(d, 1/3F, 0.03F), Mth.lerp(d, 0.5F, 0.7F), 1);
         if (distant) {
+            // use a dark red color if the toolbox is too far away
             color = Mth.hsvToRgb(0, 0.7F, 1);
         }
         Style style = Style.EMPTY.withColor(color);
