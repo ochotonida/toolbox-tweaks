@@ -94,7 +94,7 @@ public abstract class RadialToolboxMenuMixin extends AbstractSimiScreen {
 
     @Inject(method = "renderWindow", remap = false, at = @At("TAIL"))
     public void renderWindow(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
-        float fade = Mth.clamp(((float) ticksOpen + AnimationTickHolder.getPartialTicks()) / 10F, 0.002F, 1F);
+        float fade = Mth.clamp((ticksOpen + AnimationTickHolder.getPartialTicks()) / 10f, 1 / 512f, 1);
 
         PoseStack ms = graphics.pose();
         ms.pushPose();
