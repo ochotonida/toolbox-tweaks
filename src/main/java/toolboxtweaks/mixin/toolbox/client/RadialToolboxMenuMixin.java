@@ -31,6 +31,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import toolboxtweaks.registry.TTGuiTextures;
 import toolboxtweaks.toolbox.ToolboxHelper;
 import toolboxtweaks.toolbox.ToolboxItemReference;
 
@@ -188,7 +189,7 @@ public abstract class RadialToolboxMenuMixin extends AbstractSimiScreen {
     @Unique
     private Component toolboxTweaks$renderInventoryToolbox(GuiGraphics graphics, int slot, ItemStack stack) {
         boolean isSelected = slot == (scrollMode ? scrollSlot : hoveredSlot);
-        AllGuiTextures.TOOLBELT_SLOT.render(graphics, -12, -12); // TODO custom texture
+        TTGuiTextures.INVENTORY_TOOLBOX_SLOT.render(graphics, -12, -12);
         if (isSelected) {
             AllGuiTextures.TOOLBELT_SLOT_HIGHLIGHT.render(graphics, -13, -13);
         }
